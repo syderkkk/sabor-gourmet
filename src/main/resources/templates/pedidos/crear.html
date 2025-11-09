@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${titulo}">Nuevo Pedido</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-plus-circle"></i>
+                <span th:text="${titulo}">Nuevo Pedido</span>
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Información del Pedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/pedidos/guardar}" th:object="${pedidoDTO}" method="post" id="formPedido">
+                        <!-- Mesa -->
+                        <div class="mb-3">
+                            <label for="idMesa" class="form-label">
+                                <i class="bi bi-table"></i> Mesa <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" th:field="*{idMesa}" id="idMesa" required>
+                                <option value="">Seleccione una mesa</option>
+                                <option th:each="mesa : ${mesas}"
+                                        th:value="${mesa.idMesa}"
+                                        th:text="'Mesa ' + ${mesa.numero} + ' - ' + ${mesa.estado.displayName} + ' (Cap: ' + ${mesa.capacidad} + ')'"
+                                        th:disabled="${mesa.estado == T(com.restaurant.saborgourmet.model.enums.EstadoMesa).OCUPADA}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('idMesa')}"
+                                 th:errors="*{idMesa}">
+                            </div>
+                        </div>
+
+                        <!-- Cliente (Opcional) -->
+                        <div class="mb-3">
+                            <label for="idCliente" class="form-label">
+                                <i class="bi bi-person"></i> Cliente (Opcional)
+                            </label>
+                            <select class="form-select" th:field="*{idCliente}" id="idCliente">
+                                <option value="">Sin cliente</option>
+                                <option th:each="cliente : ${clientes}"
+                                        th:value="${cliente.idCliente}"
+                                        th:text="${cliente.nombreCompleto} + ' - ' + ${cliente.dni}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="mb-3">
+                            <label for="observaciones" class="form-label">
+                                <i class="bi bi-chat-left-text"></i> Observaciones
+                            </label>
+                            <textarea class="form-control" th:field="*{observaciones}"
+                                      id="observaciones" rows="3"
+                                      placeholder="Instrucciones especiales, alergias, etc."></textarea>
+                        </div>
+
+                        <!-- Platos del Pedido -->
+                        <div class="mb-3">
+                            <h5 class="border-bottom pb-2">
+                                <i class="bi bi-cart-plus"></i> Agregar Platos
+                            </h5>
+                            <div id="detallesContainer">
+                                <!-- Los detalles se agregarán dinámicamente aquí -->
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="agregarDetalle()">
+                                <i class="bi bi-plus-circle"></i> Agregar Plato
+                            </button>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a th:href="@{/pedidos}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Guardar Pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral con menú de platos -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-book"></i> Menú Disponible
+                    </h5>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    <div th:each="plato : ${platos}" class="card mb-2">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1" th:text="${plato.nombre}">Plato</h6>
+                            <p class="card-text mb-1">
+                                <small class="text-muted" th:text="${plato.tipo}">Tipo</small>
+                            </p>
+                            <p class="card-text mb-0">
+                                <strong th:text="'S/ ' + ${#numbers.formatDecimal(plato.precio, 1, 2)}">
+                                    S/ 0.00
+                                </strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        let detalleIndex = 0;
+
+        const platos = /*[[${platos}]]*/ [];
+
+        function agregarDetalle() {
+            const container = document.getElementById('detallesContainer');
+            const detalleHtml = `
+                    <div class="row mb-2 detalle-item" id="detalle-${detalleIndex}">
+                        <div class="col-md-6">
+                            <select class="form-select form-select-sm"
+                                    name="detalles[${detalleIndex}].idPlato" required>
+                                <option value="">Seleccione un plato</option>
+                                ${platos.map(plato =>
+                `<option value="${plato.idPlato}">${plato.nombre} - S/ ${plato.precio.toFixed(2)}</option>`
+            ).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control form-control-sm"
+                                   name="detalles[${detalleIndex}].cantidad"
+                                   placeholder="Cantidad" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm w-100"
+                                    onclick="eliminarDetalle(${detalleIndex})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            container.insertAdjacentHTML('beforeend', detalleHtml);
+            detalleIndex++;
+        }
+
+        function eliminarDetalle(index) {
+            const elemento = document.getElementById(`detalle-${index}`);
+            if (elemento) {
+                elemento.remove();
+            }
+        }
+
+        // Agregar al menos un detalle al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            agregarDetalle();
+        });
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sabor Gourmet</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card login-card">
+                <div class="login-header text-center">
+                    <i class="bi bi-shop" style="font-size: 3rem;"></i>
+                    <h2 class="mt-2">Sabor Gourmet</h2>
+                    <p class="mb-0">Sistema de Gestión de Restaurante</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Mensajes -->
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span th:text="${error}">Error</span>
+                    </div>
+
+                    <div th:if="${message}" class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span th:text="${message}">Mensaje</span>
+                    </div>
+
+                    <!-- Formulario de Login -->
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person"></i> Usuario
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Ingrese su usuario" required autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock"></i> Contraseña
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Ingrese su contraseña" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Usuarios de prueba -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-muted mb-2">
+                            <i class="bi bi-info-circle"></i> Usuarios de Prueba:
+                        </h6>
+                        <small class="d-block"><strong>Admin:</strong> admin / admin123</small>
+                        <small class="d-block"><strong>Mozo:</strong> mozo / mozo123</small>
+                        <small class="d-block"><strong>Cocinero:</strong> cocinero / cocinero123</small>
+                        <small class="d-block"><strong>Cajero:</strong> cajero / cajero123</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

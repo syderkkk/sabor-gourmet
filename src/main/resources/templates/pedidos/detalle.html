@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${titulo}">Detalle del Pedido</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>
+                <i class="bi bi-receipt"></i>
+                Pedido <span th:text="'#' + ${pedido.idPedido}">#1</span>
+            </h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a th:href="@{/pedidos}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <a th:href="@{/pedidos/{id}/editar(id=${pedido.idPedido})}"
+               class="btn btn-warning"
+               th:if="${pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO}"
+               sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Pedido -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Información General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-table"></i> Mesa:</strong>
+                            <p class="mb-0">Mesa <span th:text="${pedido.mesa.numero}">1</span></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-person"></i> Cliente:</strong>
+                            <p class="mb-0">
+                                    <span th:if="${pedido.cliente != null}"
+                                          th:text="${pedido.cliente.nombreCompleto}">
+                                        Cliente
+                                    </span>
+                                <span th:unless="${pedido.cliente != null}" class="text-muted">
+                                        Sin cliente registrado
+                                    </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-calendar"></i> Fecha/Hora:</strong>
+                            <p class="mb-0" th:text="${#temporals.format(pedido.fechaHora, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2025 10:00
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-flag"></i> Estado:</strong>
+                            <p class="mb-0">
+                                    <span class="badge fs-6"
+                                          th:classappend="${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).PENDIENTE} ? 'bg-warning text-dark' :
+                                                          ${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).EN_PREPARACION} ? 'bg-info' :
+                                                          ${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).SERVIDO} ? 'bg-success' :
+                                                          ${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO} ? 'bg-secondary' : 'bg-danger'"
+                                          th:text="${pedido.estado.displayName}">
+                                        Estado
+                                    </span>
+                            </p>
+                        </div>
+                        <div class="col-12" th:if="${pedido.observaciones != null && !pedido.observaciones.isEmpty()}">
+                            <strong><i class="bi bi-chat-left-text"></i> Observaciones:</strong>
+                            <p class="mb-0 text-muted" th:text="${pedido.observaciones}">
+                                Observaciones del pedido
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles del Pedido -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cart"></i> Detalles del Pedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Plato</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-end">P. Unitario</th>
+                                <th class="text-end">Subtotal</th>
+                                <th class="text-center"
+                                    th:if="${pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO}"
+                                    sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                                    Acciones
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${pedido.detalles.isEmpty()}">
+                                <td colspan="5" class="text-center text-muted">
+                                    No hay platos en este pedido
+                                </td>
+                            </tr>
+                            <tr th:each="detalle : ${pedido.detalles}">
+                                <td th:text="${detalle.plato.nombre}">Plato</td>
+                                <td class="text-center" th:text="${detalle.cantidad}">1</td>
+                                <td class="text-end"
+                                    th:text="'S/ ' + ${#numbers.formatDecimal(detalle.plato.precio, 1, 2)}">
+                                    S/ 0.00
+                                </td>
+                                <td class="text-end">
+                                    <strong th:text="'S/ ' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}">
+                                        S/ 0.00
+                                    </strong>
+                                </td>
+                                <td class="text-center"
+                                    th:if="${pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO}"
+                                    sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                                    <form th:action="@{/pedidos/{id}/eliminar-detalle/{idDetalle}(id=${pedido.idPedido}, idDetalle=${detalle.idDetallePedido})}"
+                                          method="post"
+                                          onsubmit="return confirm('¿Está seguro de eliminar este plato?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>TOTAL:</strong></td>
+                                <td class="text-end">
+                                    <h5 class="mb-0">
+                                        <strong th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">
+                                            S/ 0.00
+                                        </strong>
+                                    </h5>
+                                </td>
+                                <td th:if="${pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO}"
+                                    sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Acciones -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i> Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Cambiar Estado -->
+                    <div class="mb-3"
+                         th:if="${pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CERRADO && pedido.estado != T(com.restaurant.saborgourmet.model.enums.EstadoPedido).CANCELADO}">
+                        <h6>Cambiar Estado:</h6>
+                        <form th:action="@{/pedidos/{id}/estado(id=${pedido.idPedido})}" method="post">
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="nuevoEstado"
+                                        value="EN_PREPARACION"
+                                        class="btn btn-info btn-sm"
+                                        th:if="${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).PENDIENTE}"
+                                        sec:authorize="hasAnyRole('COCINERO', 'ADMIN')">
+                                    <i class="bi bi-fire"></i> Iniciar Preparación
+                                </button>
+
+                                <button type="submit" name="nuevoEstado"
+                                        value="SERVIDO"
+                                        class="btn btn-success btn-sm"
+                                        th:if="${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).EN_PREPARACION}"
+                                        sec:authorize="hasAnyRole('MOZO', 'COCINERO', 'ADMIN')">
+                                    <i class="bi bi-check-circle"></i> Marcar como Servido
+                                </button>
+
+                                <button type="submit" name="nuevoEstado"
+                                        value="CERRADO"
+                                        class="btn btn-secondary btn-sm"
+                                        th:if="${pedido.estado == T(com.restaurant.saborgourmet.model.enums.EstadoPedido).SERVIDO}"
+                                        sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                                    <i class="bi bi-lock"></i> Cerrar Pedido
+                                </button>
+
+                                <button type="submit" name="nuevoEstado"
+                                        value="CANCELADO"
+                                        class="btn btn-danger btn-sm"
+                                        sec:authorize="hasRole('ADMIN')"
+                                        onclick="return confirm('¿Está seguro de cancelar este pedido?');">
+                                    <i class="bi bi-x-circle"></i> Cancelar Pedido
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <hr>
+
+                    <!-- Eliminar Pedido -->
+                    <div class="d-grid" sec:authorize="hasRole('ADMIN')">
+                        <form th:action="@{/pedidos/{id}/eliminar(id=${pedido.idPedido})}"
+                              method="post"
+                              onsubmit="return confirm('¿Está seguro de eliminar este pedido? Esta acción no se puede deshacer.');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar Pedido
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

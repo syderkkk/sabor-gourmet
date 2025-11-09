@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${titulo}">Editar Pedido</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-pencil-square"></i>
+                <span th:text="${titulo}">Editar Pedido</span>
+            </h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">
+                <i class="bi bi-info-circle"></i> Editar Información del Pedido
+            </h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/pedidos/{id}/actualizar(id=${pedido.idPedido})}"
+                  th:object="${pedidoDTO}" method="post">
+
+                <!-- Observaciones -->
+                <div class="mb-3">
+                    <label for="observaciones" class="form-label">
+                        <i class="bi bi-chat-left-text"></i> Observaciones
+                    </label>
+                    <textarea class="form-control" th:field="*{observaciones}"
+                              id="observaciones" rows="3"></textarea>
+                </div>
+
+                <!-- Información de solo lectura -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Mesa Actual:</strong></label>
+                        <p class="form-control-plaintext">
+                            Mesa <span th:text="${pedido.mesa.numero}">1</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Cliente Actual:</strong></label>
+                        <p class="form-control-plaintext">
+                                <span th:if="${pedido.cliente != null}"
+                                      th:text="${pedido.cliente.nombreCompleto}">
+                                    Cliente
+                                </span>
+                            <span th:unless="${pedido.cliente != null}" class="text-muted">
+                                    Sin cliente
+                                </span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Detalles actuales -->
+                <div class="mb-3">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-cart"></i> Platos Actuales
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                            <tr>
+                                <th>Plato</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="detalle : ${pedido.detalles}">
+                                <td th:text="${detalle.plato.nombre}">Plato</td>
+                                <td th:text="${detalle.cantidad}">1</td>
+                                <td th:text="'S/ ' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}">
+                                    S/ 0.00
+                                </td>
+                                <td>
+                                    <a th:href="@{/pedidos/{id}/eliminar-detalle/{idDetalle}(id=${pedido.idPedido}, idDetalle=${detalle.idDetallePedido})}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('¿Eliminar este plato?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                                <td colspan="2">
+                                    <strong th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">
+                                        S/ 0.00
+                                    </strong>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a th:href="@{/pedidos/{id}(id=${pedido.idPedido})}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

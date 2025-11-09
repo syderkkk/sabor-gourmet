@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Sabor Gourmet</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+<!-- Navbar (copia del index.html) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="bi bi-shop"></i> Sabor Gourmet
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('MOZO', 'COCINERO', 'ADMIN')">
+                    <a class="nav-link" th:href="@{/pedidos}">
+                        <i class="bi bi-receipt"></i> Pedidos
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('COCINERO', 'ADMIN')">
+                    <a class="nav-link" th:href="@{/pedidos/cocina}">
+                        <i class="bi bi-fire"></i> Cocina
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('CAJERO', 'ADMIN')">
+                    <a class="nav-link" th:href="@{/ventas}">
+                        <i class="bi bi-cash-coin"></i> Ventas
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link active" th:href="@{/admin}">
+                        <i class="bi bi-gear"></i> Administración
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                                <span class="dropdown-item-text">
+                                    <strong>Rol:</strong> Administrador
+                                </span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-gear-fill"></i>
+                Panel de Administración
+            </h2>
+        </div>
+    </div>
+
+    <!-- Gestión de Recursos -->
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-people-fill text-primary" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Usuarios</h5>
+                    <p class="card-text">Gestión de usuarios del sistema</p>
+                    <a href="#" class="btn btn-primary">
+                        <i class="bi bi-person-gear"></i> Gestionar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-vcard text-success" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Clientes</h5>
+                    <p class="card-text">Administrar base de clientes</p>
+                    <a href="#" class="btn btn-success">
+                        <i class="bi bi-list"></i> Ver Clientes
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-table text-warning" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Mesas</h5>
+                    <p class="card-text">Configuración de mesas</p>
+                    <a href="#" class="btn btn-warning">
+                        <i class="bi bi-gear"></i> Configurar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-egg-fried text-danger" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Platos</h5>
+                    <p class="card-text">Gestión del menú</p>
+                    <a href="#" class="btn btn-danger">
+                        <i class="bi bi-book"></i> Ver Menú
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="bi bi-bar-chart-fill"></i> Reportes y Estadísticas
+            </h4>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Reporte de Ventas
+                    </h5>
+                    <p class="card-text">Visualiza las ventas por período</p>
+                    <a href="#" class="btn btn-info">
+                        <i class="bi bi-graph-up"></i> Ver Reporte
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-clipboard-data"></i> Bitácora
+                    </h5>
+                    <p class="card-text">Auditoría de acciones del sistema</p>
+                    <a href="#" class="btn btn-secondary">
+                        <i class="bi bi-clock-history"></i> Ver Bitácora
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-star-fill"></i> Platos Populares
+                    </h5>
+                    <p class="card-text">Los platos más vendidos</p>
+                    <a href="#" class="btn btn-warning">
+                        <i class="bi bi-trophy"></i> Ver Ranking
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4" role="alert">
+        <i class="bi bi-info-circle-fill"></i>
+        <strong>Nota:</strong> Este es el panel administrativo. Las funcionalidades estarán disponibles en futuras versiones.
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-5">
+    <div class="container">
+        <p class="mb-0">© 2025 Sabor Gourmet - Sistema de Gestión de Restaurante</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

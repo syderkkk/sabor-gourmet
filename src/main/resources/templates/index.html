@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Inicio - Sabor Gourmet</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-house-door-fill"></i>
+                Bienvenido al Sistema Sabor Gourmet
+            </h1>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row mb-4" sec:authorize="hasAnyRole('MOZO', 'COCINERO', 'ADMIN')">
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white">Pedidos Pendientes</h6>
+                            <h2 class="mb-0" th:text="${pedidosPendientes}">0</h2>
+                        </div>
+                        <i class="bi bi-hourglass-split" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white">En Preparación</h6>
+                            <h2 class="mb-0" th:text="${pedidosEnPreparacion}">0</h2>
+                        </div>
+                        <i class="bi bi-fire" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white">Servidos Hoy</h6>
+                            <h2 class="mb-0" th:text="${pedidosServidos}">0</h2>
+                        </div>
+                        <i class="bi bi-check-circle-fill" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">Accesos Rápidos</h3>
+        </div>
+
+        <div class="col-md-3 mb-3" sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-plus-circle text-primary" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Nuevo Pedido</h5>
+                    <p class="card-text">Registrar un nuevo pedido</p>
+                    <a th:href="@{/pedidos/nuevo}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Crear Pedido
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3" sec:authorize="hasAnyRole('MOZO', 'COCINERO', 'ADMIN')">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-list-ul text-success" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Ver Pedidos</h5>
+                    <p class="card-text">Gestionar pedidos activos</p>
+                    <a th:href="@{/pedidos}" class="btn btn-success">
+                        <i class="bi bi-eye"></i> Ver Todos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3" sec:authorize="hasAnyRole('COCINERO', 'ADMIN')">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-fire text-danger" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Vista Cocina</h5>
+                    <p class="card-text">Preparar pedidos</p>
+                    <a th:href="@{/pedidos/cocina}" class="btn btn-danger">
+                        <i class="bi bi-fire"></i> Ir a Cocina
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3" sec:authorize="hasRole('ADMIN')">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-gear text-secondary" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Administración</h5>
+                    <p class="card-text">Configuración del sistema</p>
+                    <a th:href="@{/admin}" class="btn btn-secondary">
+                        <i class="bi bi-gear"></i> Administrar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Usuario -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-person-badge"></i> Información de Sesión
+                    </h5>
+                    <p class="mb-1">
+                        <strong>Usuario:</strong> <span sec:authentication="name"></span>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Rol:</strong>
+                        <th:block sec:authorize="hasRole('ADMIN')">Administrador</th:block>
+                        <th:block sec:authorize="hasRole('MOZO')">Mozo</th:block>
+                        <th:block sec:authorize="hasRole('COCINERO')">Cocinero</th:block>
+                        <th:block sec:authorize="hasRole('CAJERO')">Cajero</th:block>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

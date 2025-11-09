@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${titulo}">Lista de Pedidos</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>
+                <i class="bi bi-receipt-cutoff"></i>
+                <span th:text="${titulo}">Gestión de Pedidos</span>
+            </h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a th:href="@{/pedidos/nuevo}" class="btn btn-primary"
+               sec:authorize="hasAnyRole('MOZO', 'ADMIN')">
+                <i class="bi bi-plus-circle"></i> Nuevo Pedido
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/pedidos}" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="estado" class="form-label">Filtrar por Estado</label>
+                    <select class="form-select" id="estado" name="estado" onchange="this.form.submit()">
+                        <option value="">Todos los estados</option>
+                        <option th:each="e : ${estados}"
+                                th:value="${e}"
+                                th:text="${e.displayName}"
+                                th:selected="${estadoFiltro != null && estadoFiltro == e.name()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-8 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary"
+                            onclick="window.location.href='/pedidos'">
+                        <i class="bi bi-x-circle"></i> Limpiar Filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Pedidos -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Mesa</th>
+                        <th>Cliente</th>
+                        <th>Fecha/Hora</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${pedidos.isEmpty()}">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-2 mb-0">No hay pedidos registrados</p>
+                        </td>
+                    </tr>
+                    <tr th:each="pedido : ${pedidos}">
+                        <td>
+                            <strong th:text="'#' + ${pedido.idPedido}">#1</strong>
+                        </td>
+                        <td>
+                            <i class="bi bi-table"></i>
+                            Mesa <span th:text="${pedido.mesa.numero}">1</span>
+                        </td>
+                        <td>
+                                    <span th:if="${pedido.cliente != null}"
+                                          th:text="${pedido.cliente.nombreCompleto}">
+                                        Cliente
+                                    </span>
+                            <span th:unless="${pedido.cliente != null}" class="text-muted">
+                                        Sin cliente
+                                    </span>
+                        </td>
+                        <td>
+                            <small th:text="${#temporals.format(pedido.fechaHora, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2025 10:00
+                            </small>
+                        </td>
+                        <td>
+                            <span th:if="${pedido.estado.name() == 'PENDIENTE'}" class="badge bg-warning text-dark">Pendiente</span>
+                            <span th:if="${pedido.estado.name() == 'EN_PREPARACION'}" class="badge bg-info">En Preparación</span>
+                            <span th:if="${pedido.estado.name() == 'SERVIDO'}" class="badge bg-success">Servido</span>
+                            <span th:if="${pedido.estado.name() == 'CERRADO'}" class="badge bg-secondary">Cerrado</span>
+                            <span th:if="${pedido.estado.name() == 'CANCELADO'}" class="badge bg-danger">Cancelado</span>
+                        </td>
+                        <td>
+                            <strong th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">
+                                S/ 0.00
+                            </strong>
+                        </td>
+                        <td th:if="${pedido.estado.name() != 'CERRADO'}">
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

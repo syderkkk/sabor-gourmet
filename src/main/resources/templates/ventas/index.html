@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas - Sabor Gourmet</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+<!-- Navbar (igual que antes) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="bi bi-shop"></i> Sabor Gourmet
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('MOZO', 'COCINERO', 'ADMIN')">
+                    <a class="nav-link" th:href="@{/pedidos}">
+                        <i class="bi bi-receipt"></i> Pedidos
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('COCINERO', 'ADMIN')">
+                    <a class="nav-link" th:href="@{/pedidos/cocina}">
+                        <i class="bi bi-fire"></i> Cocina
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('CAJERO', 'ADMIN')">
+                    <a class="nav-link active" th:href="@{/ventas}">
+                        <i class="bi bi-cash-coin"></i> Ventas
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:href="@{/admin}">
+                        <i class="bi bi-gear"></i> Administración
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                                <span class="dropdown-item-text">
+                                    <strong>Rol:</strong>
+                                    <span sec:authorize="hasRole('ADMIN')">Administrador</span>
+                                    <span sec:authorize="hasRole('CAJERO')">Cajero</span>
+                                </span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-cash-coin"></i>
+                Módulo de Ventas
+            </h2>
+        </div>
+    </div>
+
+    <!-- Estadísticas del día -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Ventas del Día</h6>
+                    <h3 class="mb-0">S/ 0.00</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Pedidos Cerrados</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Pedidos Pendientes</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Ticket Promedio</h6>
+                    <h3 class="mb-0">S/ 0.00</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pedidos para facturar -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-receipt-cutoff"></i> Pedidos Listos para Facturar
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle-fill"></i>
+                No hay pedidos listos para facturar en este momento.
+            </div>
+
+            <p class="text-muted">
+                Los pedidos en estado "SERVIDO" aparecerán aquí para su facturación.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong>Nota:</strong> El módulo de ventas está en desarrollo. Funcionalidad completa disponible próximamente.
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-5">
+    <div class="container">
+        <p class="mb-0">© 2025 Sabor Gourmet - Sistema de Gestión de Restaurante</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
